@@ -9,4 +9,6 @@ def customer_login(request):
         customers = Customer.objects.filter(email = email)
         if customers.count() == 0:
             Customer(email = email).save()
+        
+        request.session['email'] = email
         request.session['customer_id'] = Customer.objects.filter(email=email)[0].id

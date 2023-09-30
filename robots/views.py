@@ -27,6 +27,7 @@ def total_week(request):
     if request.method == 'GET':
         create_summary_robots(Robot.objects.all())
 
+        # Если сводка пустая, то файл не создается, а отправляется сообщение об отсутствии записей за последнюю неделю
         try:
             return FileResponse(open('total_week.xlsx', 'rb'))
         except:
