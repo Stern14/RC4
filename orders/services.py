@@ -9,12 +9,13 @@ from .forms import OrderForm
 
 def robots_gt_orders(serial):
 
-        count_orders = Order.objects.filter(robot_serial = serial).count()
-        count_robots = Robot.objects.filter(serial = serial).count()
-        
-        if  count_orders < count_robots:
-            return True
-        return False
+    count_orders = Order.objects.filter(robot_serial=serial).count()
+    count_robots = Robot.objects.filter(serial=serial).count()
+
+    if count_orders < count_robots:
+        return True
+    return False
+
 
 def save_wait_list(request, serial):
     try:
@@ -30,9 +31,10 @@ def save_wait_list(request, serial):
             sheet[f'A{row}'].value = serial
             sheet[f'B{row}'].value = request.session.get('email')
             break
-        row +=1
+        row += 1
     wb.save('waiting_list.xlsx')
     wb.close()
+
 
 def create_order(request):
     order = OrderForm(request.POST)
@@ -41,13 +43,14 @@ def create_order(request):
 
         if robots_gt_orders(serial):
             customer_id = request.session.get('customer_id')
-            Order(customer=Customer(id=customer_id), robot_serial=serial).save()
-            state = f'Order robot {serial} for user: {customer_id} create'
+            Order(customer=Customer(id=customer_id),
+                  robot_serial=serial).save()
+            state = f'Заказ на робота серии {serial} для пользователя {customer_id} оформлен'
 
         else:
             save_wait_list(request, serial)
-            state = 'Not have robots. I write you late'
+            state = 'Робота данной серии нет в наличии. Мы уведомим вас сразу, если в складе появиться экземпляр робота данной серии'
     else:
-        state = f'Serial is not correct! Repet please!'
+        state = 'Неверный формат запрашиваемой серии! Пример правильного формата: R2-D2'
 
     return state
